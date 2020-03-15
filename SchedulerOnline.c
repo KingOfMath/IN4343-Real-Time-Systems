@@ -5,6 +5,7 @@
 #include "Scheduler.h"
 #include "Led.h"
 #include "Context.h"
+#include "TimeTracking.h"
 
 Task Tasks[NUMTASKS];           /* Lower indices: lower priorities           */
 uint16_t NextInterruptTime;     /* Timestamp at which next interrupt should occur */
@@ -113,18 +114,25 @@ interrupt (TIMERA0_VECTOR) TimerIntrpt (void)
   /* When should the next timer interrupt occur? Note: we only want interrupts at job releases */
 
   uint8_t i = NUMTASKS-1; 
-  do{
+  uint16_t temp = 0;
+  for(i = 0; i < NUMTASKS; i++){
 	  Taskp t = &Tasks[i];
-	  if (t->Flags & TRIGGERED){
+	  if ( TRIGGERED ){
 		  t->NextRelease += t->Period; // set next release time
 		  t->Activated++;
-		  NextInterruptTime = t->NextRelease;	  
+		  if ( (i == NUMTASKS -1) || (temp > t->NextRelease) ) 
+			temp = t->NextRelease;
 	  }
-  } while (i--);
+		  
+  }
+
+	NextInterruptTime = temp;
 
   /* ---------------------------------------------------------------- */
  
 	TACCR0 = NextInterruptTime;
+	
+	//PrintResults();
 
 	Scheduler_P_FP(Tasks);
  
