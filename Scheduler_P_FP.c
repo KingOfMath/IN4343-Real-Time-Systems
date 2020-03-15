@@ -4,9 +4,12 @@
 static void ExecuteTask (Taskp t)
 {
   /* ----------------------- INSERT CODE HERE ----------------------- */
-
-  t->Invoked++;
-  t->Taskf(t->ExecutionTime); // execute task
+	if(t->Flags & TRIGGERED){
+	  t->Invoked++;
+	  t->Taskf(t->ExecutionTime); // execute task
+	}
+	else
+	  t->Invoked = t->Activated;
 
   /* ---------------------------------------------------------------- */
 
@@ -16,13 +19,14 @@ void Scheduler_P_FP (Task Tasks[])
 { 
   /* ----------------------- INSERT CODE HERE ----------------------- */
 
-  /* Super simple, single task example */
-  Taskp t = &Tasks[0];
-  if (t->Activated != t->Invoked)
-  {
-    ExecuteTask(t);
-  }
-  /* End of example*/
-
+  uint8_t i = NUMTASKS-1; 
+  do {
+	  Taskp t = &Tasks[i];
+	  if (t->Activated != t->Invoked)
+	  {
+		ExecuteTask(t);
+	  }
+  } while (i--);
+	
   /* ---------------------------------------------------------------- */
 }
