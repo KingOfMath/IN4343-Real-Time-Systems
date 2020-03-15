@@ -115,24 +115,20 @@ interrupt (TIMERA0_VECTOR) TimerIntrpt (void)
   uint8_t i = NUMTASKS-1; 
   do{
 	  Taskp t = &Tasks[i];
-	  t->NextRelease += t->Period; // set next release time
-	  t->Activated++;
-	  NextInterruptTime = t->NextRelease;
-	  
-	  TACCR0 = NextInterruptTime;
-
-	  Scheduler_P_FP(Tasks);
-  
+	  if (t->Flags & TRIGGERED){
+		  t->NextRelease += t->Period; // set next release time
+		  t->Activated++;
+		  NextInterruptTime = t->NextRelease;	  
+	  }
   } while (i--);
 
   /* ---------------------------------------------------------------- */
  
-  //if(TACCR0 == TIMERA0_VECTOR){
-	//CALL_SCHEDULER;
+	TACCR0 = NextInterruptTime;
+
 	Scheduler_P_FP(Tasks);
-  //}
  
-  ResumeContext();
+	ResumeContext();
 }
 
 #endif
