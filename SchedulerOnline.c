@@ -118,17 +118,20 @@ interrupt (TIMERA0_VECTOR) TimerIntrpt (void)
 	  t->NextRelease += t->Period; // set next release time
 	  t->Activated++;
 	  NextInterruptTime = t->NextRelease;
+	  
+	  TACCR0 = NextInterruptTime;
+
+	  Scheduler_P_FP(Tasks);
   
   } while (i--);
-  /* End of example*/
 
   /* ---------------------------------------------------------------- */
  
-
-  TACCR0 = NextInterruptTime;
-
-  CALL_SCHEDULER;
-
+  //if(TACCR0 == TIMERA0_VECTOR){
+	//CALL_SCHEDULER;
+	Scheduler_P_FP(Tasks);
+  //}
+ 
   ResumeContext();
 }
 
