@@ -114,28 +114,29 @@ interrupt (TIMERA0_VECTOR) TimerIntrpt (void)
   /* Insert timer interrupt logic, what tasks are pending? */ 
   /* When should the next timer interrupt occur? Note: we only want interrupts at job releases */
 
-  uint8_t i; 
-  uint16_t temp = 0;
-  for(i = 0; i < NUMTASKS; i++){
-	  Taskp t = &Tasks[i];
-	  if ( TRIGGERED ){
-		  t->NextRelease += t->Period; // set next release time
-		  t->Activated++;
-		  if ( (i == NUMTASKS -1) || (temp > t->NextRelease) ) 
-			temp = t->NextRelease;
-	  }	  
-  }
-
-	NextInterruptTime = temp;
+	  uint8_t i; 
+	  uint16_t temp = 0;
+	  for(i = 0; i < NUMTASKS; i++){
+		//if(i<NUMTASKS){
+		  Taskp t = &Tasks[NUMTASKS-1-i];
+		  if ( TRIGGERED ){
+			  t->NextRelease += t->Period; // set next release time
+			  t->Activated++;
+			  if ( (i == 0) || (temp > t->NextRelease) ) 
+				temp = t->NextRelease;
+			}	  
+	  }
+	  
+	if(TACCR0==TAR)
+		NextInterruptTime = temp;
 
   /* ---------------------------------------------------------------- */
   
 	StopTracking(0);
 	PrintResults();
- 
-	TACCR0 = NextInterruptTime;
 	
-	//PrintResults();
+	
+	TACCR0 = NextInterruptTime;
 
 	Scheduler_P_FP(Tasks);
  
