@@ -107,13 +107,14 @@ static void DetermineNextInterruptTime (CandidateValue)
 interrupt (TIMERA0_VECTOR) TimerIntrpt (void)
 {
   ContextSwitch();
+  StartTracking(0);
 
   /* ----------------------- INSERT CODE HERE ----------------------- */
 
   /* Insert timer interrupt logic, what tasks are pending? */ 
   /* When should the next timer interrupt occur? Note: we only want interrupts at job releases */
 
-  uint8_t i = NUMTASKS-1; 
+  uint8_t i; 
   uint16_t temp = 0;
   for(i = 0; i < NUMTASKS; i++){
 	  Taskp t = &Tasks[i];
@@ -122,13 +123,15 @@ interrupt (TIMERA0_VECTOR) TimerIntrpt (void)
 		  t->Activated++;
 		  if ( (i == NUMTASKS -1) || (temp > t->NextRelease) ) 
 			temp = t->NextRelease;
-	  }
-		  
+	  }	  
   }
 
 	NextInterruptTime = temp;
 
   /* ---------------------------------------------------------------- */
+  
+	StopTracking(0);
+	PrintResults();
  
 	TACCR0 = NextInterruptTime;
 	
