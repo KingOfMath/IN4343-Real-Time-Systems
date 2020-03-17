@@ -25,12 +25,12 @@ void Scheduler_P_FP (Task Tasks[])
 	  Taskp t = &Tasks[i];
 	  if (t->Activated != t->Invoked)
 	  {
-		StartTracking(0);
-		StartTracking(1);
+		//StartTracking(0);
+		//StartTracking(1);
 		ExecuteTask(t);
-		StopTracking(1);
-		StopTracking(0);
-		PrintResults();
+		//StopTracking(1);
+		//StopTracking(0);
+		//PrintResults();
 	  }
   } while (i--);
 	
