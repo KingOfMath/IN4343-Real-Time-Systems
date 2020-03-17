@@ -44,7 +44,10 @@ void Scheduler_P_EDF (Task Tasks[])
 	  Taskp t = &Tasks[index[i]];
 	  if (t->Activated != t->Invoked)
 	  {
+		StartTracking(1);
 		ExecuteTask(t);
+		StopTracking(1);
+		PrintResults();
 	  }
   }
   

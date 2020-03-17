@@ -107,7 +107,7 @@ static void DetermineNextInterruptTime (CandidateValue)
 interrupt (TIMERA0_VECTOR) TimerIntrpt (void)
 {
   ContextSwitch();
-  //StartTracking(0);
+  StartTracking(0);
 
   /* ----------------------- INSERT CODE HERE ----------------------- */
 
@@ -117,23 +117,22 @@ interrupt (TIMERA0_VECTOR) TimerIntrpt (void)
 	  uint8_t i; 
 	  uint16_t temp = 0;
 	  for(i = 0; i < NUMTASKS; i++){
-		//if(i<NUMTASKS){
-		  Taskp t = &Tasks[NUMTASKS-i-1];
-		  if (t->Flags == TRIGGERED ){
-			  t->NextRelease += t->Period -1 ; // set next release time
+		  Taskp t = &Tasks[NUMTASKS-1-i];
+		  if ( t->Flags & TRIGGERED ){
+			  t->NextRelease += t->Period; // set next release time
 			  t->Activated++;
-			  if ( (i == 0) || (temp > t->NextRelease) )
+			  if ( (i == 0) || (temp > t->NextRelease) ) 
 				temp = t->NextRelease;
 			}	  
 	  }
 	  
-	if(TACCR0==TAR)
-		NextInterruptTime = temp;
+	//if(TACCR0==TAR)
+	NextInterruptTime = temp;
 
   /* ---------------------------------------------------------------- */
   
-	//StopTracking(0);
-	//PrintResults();
+	StopTracking(0);
+	PrintResults();
 	
 	
 	TACCR0 = NextInterruptTime;
