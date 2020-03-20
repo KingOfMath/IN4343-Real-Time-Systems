@@ -5,12 +5,11 @@
 static void ExecuteTask (Taskp t)
 {
   /* ----------------------- INSERT CODE HERE ----------------------- */
-	if(t->Flags & TRIGGERED){
 	  t->Invoked++;
-	  t->Taskf(t->ExecutionTime); // execute task
-	}
-	else
-	  t->Invoked = t->Activated;
+
+	  t->Taskf(t->Remaining_Time); // execute task
+
+	  t->Remaining_Time = 0;
 
   /* ---------------------------------------------------------------- */
 
@@ -44,12 +43,14 @@ void Scheduler_P_FP (Task Tasks[])
   
   for(i = 0; i < NUMTASKS; i++){
 	  Taskp t = &Tasks[index[i]];
-	  if (t->Activated != t->Invoked)
+	  if (t->Activated != t->Invoked && t->Remaining_Time > 0)
 	  {
+	      _EINT();
 		StartTracking(1);
 		ExecuteTask(t);
 		StopTracking(1);
 		PrintResults();
+		_DINT();
 	  }
   }
 	

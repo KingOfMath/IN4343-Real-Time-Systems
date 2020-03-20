@@ -68,6 +68,7 @@ uint8_t RegisterTask (uint16_t Phasing, uint16_t Period, uint16_t ExecutionTime,
     t->Taskf     = TaskFunc; 
     t->ExecutionTime = ExecutionTime;
     t->Flags     = Flags | TRIGGERED;
+    t->Remaining_Time = 0;
 
   }
   RestoreSW (sw);
@@ -107,37 +108,41 @@ static void DetermineNextInterruptTime (CandidateValue)
 interrupt (TIMERA0_VECTOR) TimerIntrpt (void)
 {
   ContextSwitch();
-  StartTracking(0);
+  //StartTracking(0);
 
   /* ----------------------- INSERT CODE HERE ----------------------- */
 
   /* Insert timer interrupt logic, what tasks are pending? */ 
   /* When should the next timer interrupt occur? Note: we only want interrupts at job releases */
 
-	  uint8_t i; 
+	  uint8_t i;
 	  uint16_t temp = 0;
 	  for(i = 0; i < NUMTASKS; i++){
-		  Taskp t = &Tasks[NUMTASKS-1-i];
-		  if ( t->Flags & TRIGGERED ){
-			  t->NextRelease += t->Period; // set next release time
-			  t->Activated++;
-			  if ( (i == 0) || (temp > t->NextRelease) ) 
-				temp = t->NextRelease;
-			}	  
+		  Taskp t = &Tasks[i];
+          if(t->Remaining_Time == 0) {
+              t->NextRelease += t->Period; // set next release time
+              t->Activated++;
+              t->Remaining_Time = t->ExecutionTime;
+          }
+
+          if ( (i == 0) || (temp > t->NextRelease) )
+              temp = t->NextRelease;
 	  }
+
+
 	  
 	//if(TACCR0==TAR)
 	NextInterruptTime = temp;
 
   /* ---------------------------------------------------------------- */
   
-	StopTracking(0);
-	PrintResults();
+	//StopTracking(0);
+	//PrintResults();
 	
 	
 	TACCR0 = NextInterruptTime;
 
-	Scheduler_P_FP(Tasks);
+	CALL_SCHEDULER;
  
 	ResumeContext();
 }
