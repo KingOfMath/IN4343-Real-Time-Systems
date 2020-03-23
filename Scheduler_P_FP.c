@@ -19,7 +19,7 @@ void Scheduler_P_FP (Task Tasks[])
 { 
   /* ----------------------- INSERT CODE HERE ----------------------- */
 
-  uint8_t i,j; 
+  uint8_t i,j;
   int sorted[NUMTASKS];
   int index[NUMTASKS];
   for(i = 0; i < NUMTASKS; i++){
@@ -33,14 +33,14 @@ void Scheduler_P_FP (Task Tasks[])
 			 int temp = tj->Prio;
 			 tj->Prio = ti->Prio;
 			 ti->Prio = temp;
-			 
+
 			 temp = index[i];
 			 index[i] = index[j];
 			 index[j] = temp;
 		 }
 	 }
   }
-  
+
   for(i = 0; i < NUMTASKS; i++){
 	  Taskp t = &Tasks[index[i]];
 	  if (t->Activated != t->Invoked && t->Remaining_Time > 0)

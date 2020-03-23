@@ -9,6 +9,7 @@
 
 Task Tasks[NUMTASKS];           /* Lower indices: lower priorities           */
 uint16_t NextInterruptTime;     /* Timestamp at which next interrupt should occur */
+uint16_t Flag = 1;
 
 uint16_t IntDisable (void)
 {
@@ -119,7 +120,7 @@ interrupt (TIMERA0_VECTOR) TimerIntrpt (void)
 	  uint16_t temp = 0;
 	  for(i = 0; i < NUMTASKS; i++){
 		  Taskp t = &Tasks[i];
-          if(t->Remaining_Time == 0) {
+          if((/*t->Remaining_Time == 0 && */TACCR0 == t->NextRelease)|| Flag == 1) {
               t->NextRelease += t->Period; // set next release time
               t->Activated++;
               t->Remaining_Time = t->ExecutionTime;
@@ -130,8 +131,8 @@ interrupt (TIMERA0_VECTOR) TimerIntrpt (void)
 	  }
 
 
-	  
-	//if(TACCR0==TAR)
+    Flag = 0;
+
 	NextInterruptTime = temp;
 
   /* ---------------------------------------------------------------- */
